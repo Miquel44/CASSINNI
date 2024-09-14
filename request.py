@@ -18,7 +18,7 @@ true_color = connection.load_collection(
     "SENTINEL2_L1C",
     temporal_extent=["2024-09-13", "2024-09-13"],
     spatial_extent=extent,
-    bands=["B02", "B03", "B04"],
+    bands=["B02", "B03", "B04", "B08"],
     max_cloud_cover=30,
 )
 
@@ -31,6 +31,7 @@ with rasterio.open("true_color.tiff") as src:
     band_blue = src.read(1)  # B02 - Azul
     band_green = src.read(2)  # B03 - Verde
     band_red = src.read(3)  # B04 - Rojo
+    band_nir = src.read(4)  # B08 - NIR
 
 # Función para normalizar las bandas (ajustar a 0-1 para visualización)
 def normalize(array):
@@ -45,6 +46,9 @@ band_red_norm = normalize(band_red)
 # Crear una imagen RGB combinando las bandas normalizadas
 rgb_image = np.dstack((band_red_norm, band_green_norm, band_blue_norm))
 
+# Calcular ndvi
+ndvi = (band_nir - band_red) / (band_nir + band_red)
+
 # Visualizar la imagen RGB
 plt.figure(figsize=(10, 10))
 plt.imshow(rgb_image)
@@ -53,4 +57,17 @@ plt.axis('off')
 plt.show()
 
 # Guardar la imagen RGB en formato PNG
-plt.imsave("imagen_rgb.png", rgb_image)
+plt.imsave("imagen_rgb.tiff", rgb_image)
+
+
+plt.figure(figsize=(10, 10))
+plt.imshow(ndvi, cmap="RdYlGn")
+plt.title("NDVI")
+plt.colorbar(label="NDVI Value")
+plt.axis('off')
+plt.show()
+
+# Guardar la imagen de NDVI como PNG
+plt.imsave("ndvi_image.tiff", ndvi, cmap="RdYlGn")
+
+
