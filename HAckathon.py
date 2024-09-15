@@ -59,29 +59,23 @@ plt.show()
 
 plt.imsave("ndvi_image.tiff", ndvi, cmap="RdYlGn")
 plt.imsave("ndvi_image2.tiff", ndvi, cmap="RdYlGn")
+def Corridor_checker(filtered_image,threshold1,threshold2):
 
-def Corridor_checker(filtered_images, min_thresholds, max_thresholds):
+    mask = np.logical_or(filtered_image <= threshold1, filtered_image >= threshold2)
 
-    matrix = np.zeros((filtered_images.shape[0], filtered_images.shape[1]))
-    
-    for image, index in enumerate(filtered_images):
+    rgb_ndvi = np.zeros((filtered_image.shape[0], filtered_image.shape[1], 3))
 
-        height, weight  = filtered_images.shape[0], filtered_images.shape[1]
+    rgb_ndvi[..., 0] = np.where(filtered_image <= threshold1, 1, 0)
 
-        grey = np.zeros((height, weight))
+    rgb_ndvi[..., 1] = np.where(filtered_image >= threshold2, 1, 0)
 
-        grey[:, 0] = np.where(filtered_images <= min_thresholds[index], 1, 0)
+    rgb_ndvi[~mask] = 1
 
-        grey[:, 1] = np.where(filtered_images >= max_thresholds[index], 1, 0)
-
-        matrix += grey
-    return matrix
-
-    # plt.figure(figsize=(10, 10))
-    # plt.imshow(rgb_ndvi)
-    # plt.title("filtered_images Urban vs Vegetation")
-    # plt.axis('off')
-    # plt.show()
-    # return 
-
+    # Display the image
+    plt.figure(figsize=(10, 10))
+    plt.imshow(rgb_ndvi)
+    plt.title("filtered_image Urban vs Vegetation")
+    plt.axis('off')
+    plt.show()
+    plt.imsave("Miquel_nvdi.tiff", rgb_ndvi)
 Corridor_checker(ndvi,0.3,0.5)
